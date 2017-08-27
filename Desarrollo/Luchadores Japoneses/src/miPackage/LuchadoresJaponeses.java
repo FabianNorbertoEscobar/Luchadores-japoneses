@@ -1,6 +1,7 @@
 package miPackage;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -9,66 +10,58 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class LuchadoresJaponeses {
-	
-	static int cantidadLuchadores;
-	
-	static List<Luchador> luchadores;
-	
-	static int dominados[];
-	
-	public static void inicializarVector(int[] v) {
-		
-		for (int i = 0; i < v.length; i++) {
-			v[i] = 0;
-		}
+public class LuchadoresJaponeses extends EjercicioOIA {
+
+	private int cantidadLuchadores;
+	private List<Luchador> luchadores;
+	private static int dominados[];
+
+	public LuchadoresJaponeses(File entrada, File salida) throws FileNotFoundException, IOException {
+		super(entrada, salida);
+		this.cargarLuchadores();
 	}
-	
-	public static void cargarLuchadores(String path) throws FileNotFoundException, IOException {
-		
-		FileReader file = new FileReader(path);
+
+	private void cargarLuchadores() throws FileNotFoundException, IOException {
+		FileReader file = new FileReader(this.entrada);
 		Scanner scan = new Scanner(file);
-		
+
 		luchadores = new ArrayList<Luchador>();
-		
 		cantidadLuchadores = scan.nextInt();
-		
+
 		for (int i = 0; i < cantidadLuchadores; i++) {
-			
 			Luchador luchador = new Luchador(i);
 			luchador.setPeso(scan.nextDouble());
 			luchador.setAltura(scan.nextDouble());
-			
 			luchadores.add(luchador);
 		}
-		
 		scan.close();
 	}
-	
-	public static void contarDominados() {
-		
+
+	private void contarDominados() {
 		dominados = new int[cantidadLuchadores];
-		inicializarVector(dominados);
-		
-		for (Luchador luchador: luchadores) {
-			for (Luchador rival: luchadores) {
+		for (Luchador luchador : luchadores) {
+			for (Luchador rival : luchadores) {
 				if (luchador.domina(rival)) {
-					dominados[luchador.getNumero()] ++;
+					dominados[luchador.getNumero()]++;
 				}
 			}
 		}
 	}
-	
-	public static void crearArchivoSalida(String path) throws IOException {
-		
-		FileWriter file = new FileWriter(path);
+
+	private void crearArchivoSalida() throws IOException {
+		FileWriter file = new FileWriter(this.salida);
 		BufferedWriter buffer = new BufferedWriter(file);
-		
-		for (int dominado: dominados) {
+
+		for (int dominado : dominados) {
 			buffer.write(Integer.toString(dominado));
 			buffer.newLine();
 		}
-		
 		buffer.close();
+	}
+
+	@Override
+	public void resolver() throws FileNotFoundException, IOException {
+		this.contarDominados();
+		this.crearArchivoSalida();
 	}
 }
